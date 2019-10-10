@@ -1,0 +1,15 @@
+#+title: radmc3d-install
+#+author: Thomas Rometsch
+
+An installer script for the [[http://www.ita.uni-heidelberg.de/~dullemond/software/radmc-3d/index.html][RADMC3D]] code by Cornelis Dullemond.
+
+** Description
+
+This script downloads the source code, compliles it and copies it to =~/.local/bin=.
+
+The =radmc3dPy= package is patched to use python3 setuptools and installed via =setup.py install --user=.
+
+** Requirements
+
+Building the code needs =gfortran=.
+Make sure this is installed.

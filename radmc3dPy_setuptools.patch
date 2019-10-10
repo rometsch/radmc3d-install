@@ -1,0 +1,165 @@
+Only in radmc-3d/version_0.41/python: build
+Only in radmc-3d/version_0.41/python: dist
+diff -crB radmc-3d/version_0.41/python/radmc3dPy/analyze.py radmc-3d/version_0.41/python/radmc3dPy/analyze.py
+*** radmc-3d/version_0.41/python/radmc3dPy/analyze.py	2017-05-14 12:42:50.000000000 +0200
+--- radmc-3d/version_0.41/python/radmc3dPy/analyze.py	2019-10-10 22:54:00.506733999 +0200
+***************
+*** 32,38 ****
+  
+  from radmc3dPy.natconst import *
+  import radmc3dPy.crd_trans  as crd_trans 
+! from staratm import StellarAtm
+  
+  class radmc3dOctree(object):
+      """
+--- 32,38 ----
+  
+  from radmc3dPy.natconst import *
+  import radmc3dPy.crd_trans  as crd_trans 
+! from radmc3dPy.staratm import StellarAtm
+  
+  class radmc3dOctree(object):
+      """
+diff -crB radmc-3d/version_0.41/python/radmc3dPy/__init__.py radmc-3d/version_0.41/python/radmc3dPy/__init__.py
+*** radmc-3d/version_0.41/python/radmc3dPy/__init__.py	2017-03-20 12:54:28.000000000 +0100
+--- radmc-3d/version_0.41/python/radmc3dPy/__init__.py	2019-10-10 22:53:08.194768165 +0200
+***************
+*** 3,15 ****
+   (c) Attila Juhasz, 2011-2017
+  
+  """
+! import analyze
+! import setup 
+! import image
+! import crd_trans
+! import natconst
+! import models
+! import staratm
+  
+  __version__ = "0.29"
+  __author__ = "Attila Juhasz"
+--- 3,15 ----
+   (c) Attila Juhasz, 2011-2017
+  
+  """
+! from . import analyze
+! from . import setup 
+! from . import image
+! from . import crd_trans
+! from . import natconst
+! from . import models
+! from . import staratm
+  
+  __version__ = "0.29"
+  __author__ = "Attila Juhasz"
+diff -crB radmc-3d/version_0.41/python/radmc3dPy/models/__init__.py radmc-3d/version_0.41/python/radmc3dPy/models/__init__.py
+*** radmc-3d/version_0.41/python/radmc3dPy/models/__init__.py	2014-10-03 16:00:17.000000000 +0200
+--- radmc-3d/version_0.41/python/radmc3dPy/models/__init__.py	2019-10-10 22:56:57.802617856 +0200
+***************
+*** 1,7 ****
+  """
+  This module contains models and functions to manage the library/list of models
+  """
+! from _libfunc import *
+  
+  __all__ = ["updateModelList", "getModelNames", "getModelDesc"]
+  
+--- 1,7 ----
+  """
+  This module contains models and functions to manage the library/list of models
+  """
+! from ._libfunc import *
+  
+  __all__ = ["updateModelList", "getModelNames", "getModelDesc"]
+  
+Only in radmc-3d/version_0.41/python: radmc3dPy.egg-info
+diff -crB radmc-3d/version_0.41/python/setup.py radmc-3d/version_0.41/python/setup.py
+*** radmc-3d/version_0.41/python/setup.py	2017-03-20 12:54:28.000000000 +0100
+--- radmc-3d/version_0.41/python/setup.py	2019-10-10 23:19:56.393731924 +0200
+***************
+*** 1,71 ****
+! #!/usr/bin/env python
+! 
+! from distutils.core import setup
+! import os, sys
+! from subprocess import Popen, PIPE
+! 
+! def findFiles(src_dir, *wildcards):
+! 
+!     src_dir = src_dir.strip()
+!     while src_dir[-1]=='/':
+!         src_dir = src_dir[:-1]
+! 
+! 
+!     # Find all directory names
+!     dirList = Popen(['find '+src_dir+' -name "*"'], shell=True, \
+!             stdout=PIPE).communicate()[0].split()
+!    
+! 
+!     foundList = []
+!     for i in range(len(dirList)):
+!         #if (os.path.isdir(dirList[i])&(dirList[i].strip()!=src_dir)):
+!         if os.path.isdir(dirList[i]):
+!             # Find the appropriate files within each directory
+!             fileList = []
+!             for wc in wildcards:
+!                 dum = Popen(['ls -1 '+dirList[i]+'/'+wc], shell=True, \
+!                         stdout=PIPE, stderr=PIPE).communicate()[0].split()
+!                 #dum = Popen(['find '+dirList[i]+' -name "'+wc+'"'], shell=True, \
+!                         #stdout=PIPE).communicate()[0].split()
+! 
+!                 if len(dum)>0:
+!                     fileList.extend(dum)
+! 
+!             if len(fileList)>0:
+!                 foundList.append((dirList[i], fileList))
+! 
+!     return foundList    
+!    
+! fileList = findFiles('./radmc3dPy', '*.py')
+! 
+! python_files = []
+! for i in range(len(fileList)):
+!     for j in range(len(fileList[i][1])):
+!         python_files.append(fileList[i][1][j])
+! 
+! moduleNames = []
+! packageNames = []
+! for i in range(len(python_files)):
+! 
+!     ind1 = python_files[i].strip()[::-1].find('/')
+!     dum  = python_files[i].strip()[-ind1:-3]
+! 
+!     if dum.strip()!='__init__':
+!         moduleNames.append('radmc3dPy.'+dum)
+!     else:
+!         sdum = python_files[i].split('/')[1:-1]
+! 
+!         txt = sdum[0]
+!         if len(sdum)>1:
+!             for imod in range(1,len(sdum)):
+!                 txt += '.'+sdum[imod]
+! 
+!         packageNames.append(txt)
+  
+  setup(name='radmc3dPy',
+          version='0.29',
+        description='Python module for RADMC3D',
+        author='Attila Juhasz',
+        author_email='juhasz@ast.cam.ac.uk',
+!       packages=packageNames)
+  
+--- 1,13 ----
+! #!/usr/bin/env python3
+! import os
+! from setuptools import setup, find_namespace_packages
+  
+  setup(name='radmc3dPy',
+          version='0.29',
+        description='Python module for RADMC3D',
+        author='Attila Juhasz',
+        author_email='juhasz@ast.cam.ac.uk',
+!       package_dir={'': '.'},
+!       packages=["radmc3dPy", "radmc3dPy.models"],
+!       zip_safe=False)
+  
